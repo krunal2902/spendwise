@@ -101,14 +101,14 @@
 - [x] Test: Per-category limits, spent vs budgeted
 
 ### Phase 9: Time-Bound Budgets & Carry-Forward
-- [ ] Add `start_date`, `end_date`, `type` columns to budgets (migration)
-- [ ] Update `Budget` model with date scopes
-- [ ] Update `BudgetService` with date-range filtering & carry-forward logic
-- [ ] Create `BudgetCarryForwardCommand` (Artisan scheduled command)
-- [ ] Register scheduled command in `routes/console.php`
-- [ ] Update budget views (date range picker, carry-forward indicator)
-- [ ] Update form requests for new date fields
-- [ ] Test: Custom date budgets, carry-forward execution
+- [x] Add `start_date`, `end_date`, `type` columns to budgets (migration)
+- [x] Update `Budget` model with date scopes
+- [x] Update `BudgetService` with date-range filtering & carry-forward logic
+- [x] Create `BudgetCarryForwardCommand` (Artisan scheduled command)
+- [x] Register scheduled command in `routes/console.php`
+- [x] Update budget views (date range picker, carry-forward indicator)
+- [x] Update form requests for new date fields
+- [x] Test: Custom date budgets, carry-forward execution
 
 ### Phase 10: Recurring / Scheduled Expenses
 - [ ] Create `recurring_expenses` migration

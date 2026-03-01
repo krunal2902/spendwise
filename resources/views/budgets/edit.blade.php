@@ -20,10 +20,28 @@
                     <x-input-error :messages="$errors->get('amount')" class="mt-2" />
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 mb-4">
+                {{-- Budget Type Toggle --}}
+                <div class="mb-4">
+                    <x-input-label :value="__('Budget Type')" />
+                    <div class="flex items-center gap-4 mt-2">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="type" value="monthly" {{ old('type', $budget->type) === 'monthly' ? 'checked' : '' }}
+                                   onchange="toggleBudgetType()" class="text-indigo-600 focus:ring-indigo-500">
+                            <span class="text-sm text-gray-700">Monthly</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="type" value="custom" {{ old('type', $budget->type) === 'custom' ? 'checked' : '' }}
+                                   onchange="toggleBudgetType()" class="text-indigo-600 focus:ring-indigo-500">
+                            <span class="text-sm text-gray-700">Custom Date Range</span>
+                        </label>
+                    </div>
+                </div>
+
+                {{-- Monthly Fields --}}
+                <div id="monthlyFields" class="grid grid-cols-2 gap-4 mb-4">
                     <div>
                         <x-input-label for="month" :value="__('Month')" />
-                        <select id="month" name="month" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                        <select id="month" name="month" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
                             @for($m = 1; $m <= 12; $m++)
                                 <option value="{{ $m }}" {{ old('month', $budget->month) == $m ? 'selected' : '' }}>
                                     {{ date('F', mktime(0, 0, 0, $m, 1)) }}
@@ -34,7 +52,7 @@
                     </div>
                     <div>
                         <x-input-label for="year" :value="__('Year')" />
-                        <select id="year" name="year" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                        <select id="year" name="year" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
                             @for($y = now()->year - 2; $y <= now()->year + 2; $y++)
                                 <option value="{{ $y }}" {{ old('year', $budget->year) == $y ? 'selected' : '' }}>{{ $y }}</option>
                             @endfor
@@ -42,6 +60,40 @@
                         <x-input-error :messages="$errors->get('year')" class="mt-2" />
                     </div>
                 </div>
+
+                {{-- Custom Date Range Fields --}}
+                <div id="customFields" class="grid grid-cols-2 gap-4 mb-4 hidden">
+                    <div>
+                        <x-input-label for="start_date" :value="__('Start Date')" />
+                        <x-text-input id="start_date" name="start_date" type="date" class="mt-1 block w-full" :value="old('start_date', $budget->start_date?->format('Y-m-d'))" />
+                        <x-input-error :messages="$errors->get('start_date')" class="mt-2" />
+                    </div>
+                    <div>
+                        <x-input-label for="end_date" :value="__('End Date')" />
+                        <x-text-input id="end_date" name="end_date" type="date" class="mt-1 block w-full" :value="old('end_date', $budget->end_date?->format('Y-m-d'))" />
+                        <x-input-error :messages="$errors->get('end_date')" class="mt-2" />
+                    </div>
+                </div>
+
+                {{-- Carry Forward --}}
+                <div class="mb-4">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="hidden" name="carry_forward" value="0">
+                        <input type="checkbox" name="carry_forward" value="1" {{ old('carry_forward', $budget->carry_forward) ? 'checked' : '' }}
+                               class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+                        <span class="text-sm text-gray-700">Carry forward unspent amount to next period</span>
+                    </label>
+                    <p class="text-xs text-gray-400 mt-1 ml-6">Remaining balance will be added to the next month's budget automatically.</p>
+                </div>
+
+                @if($budget->carried_amount > 0)
+                    <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <p class="text-sm text-green-700">
+                            <i class="fas fa-forward text-xs"></i>
+                            ₹{{ number_format($budget->carried_amount, 2) }} was carried forward into this budget.
+                        </p>
+                    </div>
+                @endif
 
                 <div class="mb-4">
                     <x-input-label for="notes" :value="__('Notes (optional)')" />
@@ -56,4 +108,15 @@
             </form>
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        function toggleBudgetType() {
+            const type = document.querySelector('input[name="type"]:checked').value;
+            document.getElementById('monthlyFields').classList.toggle('hidden', type === 'custom');
+            document.getElementById('customFields').classList.toggle('hidden', type === 'monthly');
+        }
+        document.addEventListener('DOMContentLoaded', toggleBudgetType);
+    </script>
+    @endpush
 </x-app-layout>
