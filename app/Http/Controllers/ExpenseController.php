@@ -7,6 +7,7 @@ use App\Http\Requests\Expense\UpdateExpenseRequest;
 use App\Models\Expense;
 use App\Services\CategoryService;
 use App\Services\ExpenseService;
+use App\Services\TagService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -17,6 +18,7 @@ class ExpenseController extends Controller
     public function __construct(
         private ExpenseService $expenseService,
         private CategoryService $categoryService,
+        private TagService $tagService,
     ) {}
 
     public function index(Request $request)
@@ -52,10 +54,11 @@ class ExpenseController extends Controller
 
     public function create(Request $request): View
     {
-        $accounts = $request->user()->accounts()->active()->get();
+        $accounts   = $request->user()->accounts()->active()->get();
         $categories = $this->categoryService->getForUser($request->user(), 'expense');
+        $userTags   = $this->tagService->getForUser($request->user());
 
-        return view('expenses.create', compact('accounts', 'categories'));
+        return view('expenses.create', compact('accounts', 'categories', 'userTags'));
     }
 
     public function store(StoreExpenseRequest $request): RedirectResponse
@@ -76,10 +79,13 @@ class ExpenseController extends Controller
             abort(403);
         }
 
-        $accounts = $request->user()->accounts()->active()->get();
-        $categories = $this->categoryService->getForUser($request->user(), 'expense');
+        $expense->load(['tags', 'histories.user']);
 
-        return view('expenses.edit', compact('expense', 'accounts', 'categories'));
+        $accounts   = $request->user()->accounts()->active()->get();
+        $categories = $this->categoryService->getForUser($request->user(), 'expense');
+        $userTags   = $this->tagService->getForUser($request->user());
+
+        return view('expenses.edit', compact('expense', 'accounts', 'categories', 'userTags'));
     }
 
     public function update(UpdateExpenseRequest $request, Expense $expense): RedirectResponse

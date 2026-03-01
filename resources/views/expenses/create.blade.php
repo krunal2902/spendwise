@@ -52,6 +52,33 @@
                     <x-input-error :messages="$errors->get('description')" class="mt-2" />
                 </div>
 
+                {{-- Tags --}}
+                <div class="mb-4">
+                    <x-input-label :value="__('Tags (optional)')" />
+                    <div id="tagContainer" class="flex flex-wrap gap-2 mt-1 mb-2">
+                        @if(old('tags'))
+                            @foreach(old('tags') as $tag)
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-medium">
+                                    {{ $tag }}
+                                    <input type="hidden" name="tags[]" value="{{ $tag }}">
+                                    <button type="button" onclick="this.parentElement.remove()" class="text-indigo-400 hover:text-indigo-600">&times;</button>
+                                </span>
+                            @endforeach
+                        @endif
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="tagInput" list="tagSuggestions" placeholder="Type a tag and press Enter"
+                               class="flex-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm">
+                        <datalist id="tagSuggestions">
+                            @foreach($userTags as $tag)
+                                <option value="{{ $tag->name }}">
+                            @endforeach
+                        </datalist>
+                        <button type="button" onclick="addTag()" class="px-3 py-2 bg-indigo-50 text-indigo-600 rounded-md text-sm hover:bg-indigo-100">Add</button>
+                    </div>
+                    <x-input-error :messages="$errors->get('tags')" class="mt-2" />
+                </div>
+
                 <div class="mb-4">
                     <x-input-label for="notes" :value="__('Notes (optional)')" />
                     <textarea id="notes" name="notes" rows="3" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" placeholder="Any additional notes...">{{ old('notes') }}</textarea>
@@ -71,4 +98,31 @@
             </form>
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        function addTag() {
+            const input = document.getElementById('tagInput');
+            const name = input.value.trim().toLowerCase();
+            if (!name) return;
+
+            const container = document.getElementById('tagContainer');
+            // Check for duplicates
+            const existing = container.querySelectorAll('input[name="tags[]"]');
+            for (const el of existing) {
+                if (el.value.toLowerCase() === name) { input.value = ''; return; }
+            }
+
+            const span = document.createElement('span');
+            span.className = 'inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-medium';
+            span.innerHTML = `${name}<input type="hidden" name="tags[]" value="${name}"><button type="button" onclick="this.parentElement.remove()" class="text-indigo-400 hover:text-indigo-600">&times;</button>`;
+            container.appendChild(span);
+            input.value = '';
+        }
+
+        document.getElementById('tagInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') { e.preventDefault(); addTag(); }
+        });
+    </script>
+    @endpush
 </x-app-layout>

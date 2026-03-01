@@ -22,6 +22,8 @@ class UpdateExpenseRequest extends FormRequest
             'expense_date' => 'required|date|before_or_equal:today',
             'reference'    => 'nullable|string|max:100',
             'notes'        => 'nullable|string|max:1000',
+            'tags'         => 'nullable|array',
+            'tags.*'       => 'string|max:50',
         ];
     }
 

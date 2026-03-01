@@ -123,20 +123,20 @@
 - [x] Test: Recurring CRUD, auto-creation accuracy, balance impact
 
 ### Phase 11: Expense Tags & Edit History
-- [ ] Create `tags` migration (user_id, name)
-- [ ] Create `expense_tag` pivot migration
-- [ ] Create `Tag` model
-- [ ] Update `Expense` model with `tags()` relationship
-- [ ] Create `TagService`
-- [ ] Update `ExpenseService` to handle tags on create/update
-- [ ] Update expense views (tag input, display)
-- [ ] Update expense form requests for tags validation
-- [ ] Create `expense_histories` migration
-- [ ] Create `ExpenseHistory` model
-- [ ] Update `ExpenseService` to log history on update
-- [ ] Add history view to expense edit page
-- [ ] Add routes for tags if needed
-- [ ] Test: Tag CRUD, tagging expenses, edit history tracking
+- [x] Create `tags` migration (user_id, name)
+- [x] Create `expense_tag` pivot migration
+- [x] Create `Tag` model
+- [x] Update `Expense` model with `tags()` relationship
+- [x] Create `TagService`
+- [x] Update `ExpenseService` to handle tags on create/update
+- [x] Update expense views (tag input, display)
+- [x] Update expense form requests for tags validation
+- [x] Create `expense_histories` migration
+- [x] Create `ExpenseHistory` model
+- [x] Update `ExpenseService` to log history on update
+- [x] Add history view to expense edit page
+- [x] Add routes for tags if needed
+- [x] Test: Tag CRUD, tagging expenses, edit history tracking
 
 ### Phase 12: Category Locking & Part 2 Final Testing
 - [ ] Add `is_locked` column to `categories` table (migration)

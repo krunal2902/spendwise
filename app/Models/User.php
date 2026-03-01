@@ -96,6 +96,11 @@ class User extends Authenticatable
         return $this->hasMany(RecurringExpense::class);
     }
 
+    public function tags(): HasMany
+    {
+        return $this->hasMany(Tag::class);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Helpers

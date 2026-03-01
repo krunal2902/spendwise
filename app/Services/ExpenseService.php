@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Expense;
+use App\Models\ExpenseHistory;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -10,6 +11,7 @@ class ExpenseService
 {
     public function __construct(
         private ActivityLogService $activityLogService,
+        private TagService $tagService,
     ) {}
 
     /**
@@ -25,10 +27,19 @@ class ExpenseService
                 throw new \Exception("Insufficient balance in {$account->name}. Available: ₹" . number_format($account->balance, 2));
             }
 
+            // Extract tags before creating expense
+            $tags = $data['tags'] ?? [];
+            unset($data['tags']);
+
             $expense = $user->expenses()->create($data);
 
             // Decrease account balance
             $account->decrement('balance', $expense->amount);
+
+            // Sync tags
+            if (!empty($tags)) {
+                $this->tagService->syncForExpense($user, $expense, $tags);
+            }
 
             $this->activityLogService->log('created', $expense, null, $expense->toArray());
 
@@ -45,6 +56,10 @@ class ExpenseService
             $oldValues = $expense->toArray();
             $oldAmount = $expense->amount;
             $oldAccountId = $expense->account_id;
+
+            // Extract tags before updating
+            $tags = $data['tags'] ?? [];
+            unset($data['tags']);
 
             if ($oldAccountId !== ($data['account_id'] ?? $oldAccountId)) {
                 // Account changed — reverse old, apply new
@@ -71,8 +86,14 @@ class ExpenseService
                 }
             }
 
+            // Log edit history before updating
+            $this->logHistory($expense, $oldValues, $data);
+
             $expense->update($data);
             $expense->refresh();
+
+            // Sync tags
+            $this->tagService->syncForExpense($expense->user, $expense, $tags);
 
             $this->activityLogService->log('updated', $expense, $oldValues, $expense->toArray());
 
@@ -95,5 +116,33 @@ class ExpenseService
 
             $expense->delete();
         });
+    }
+
+    /**
+     * Log expense edit history.
+     */
+    private function logHistory(Expense $expense, array $oldValues, array $newValues): void
+    {
+        // Build a human-readable change summary
+        $changes = [];
+        $trackFields = ['amount', 'account_id', 'category_id', 'description', 'expense_date', 'reference', 'notes'];
+
+        foreach ($trackFields as $field) {
+            if (isset($newValues[$field]) && (string) ($oldValues[$field] ?? '') !== (string) $newValues[$field]) {
+                $changes[] = str_replace('_', ' ', $field);
+            }
+        }
+
+        if (empty($changes)) {
+            return; // No meaningful changes
+        }
+
+        ExpenseHistory::create([
+            'expense_id'     => $expense->id,
+            'user_id'        => $expense->user_id,
+            'old_values'     => array_intersect_key($oldValues, array_flip($trackFields)),
+            'new_values'     => array_intersect_key($newValues, array_flip($trackFields)),
+            'change_summary' => 'Changed: ' . implode(', ', $changes),
+        ]);
     }
 }
