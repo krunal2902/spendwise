@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Models\Budget;
 use Carbon\Carbon;
 
 class DashboardService
@@ -67,17 +68,46 @@ class DashboardService
             ];
         }
 
+        // Budget overview for current month
+        $activeBudgets = $user->budgets()
+            ->forMonth((int) $currentMonth->month, (int) $currentMonth->year)
+            ->with('categoryBudgets.category')
+            ->get()
+            ->map(function ($budget) {
+                return [
+                    'id'            => $budget->id,
+                    'name'          => $budget->name,
+                    'amount'        => (float) $budget->amount + (float) $budget->carried_amount,
+                    'spent'         => $budget->spent,
+                    'remaining'     => $budget->remaining,
+                    'usage_percent' => $budget->usage_percent,
+                    'is_exceeded'   => $budget->is_exceeded,
+                    'period_label'  => $budget->period_label,
+                ];
+            });
+
+        // Upcoming recurring expenses (next 7 days)
+        $upcomingRecurring = $user->recurringExpenses()
+            ->active()
+            ->where('next_due_date', '<=', now()->addDays(7))
+            ->with(['category', 'account'])
+            ->orderBy('next_due_date')
+            ->limit(5)
+            ->get();
+
         return [
-            'totalBalance'      => $totalBalance,
-            'monthlyIncome'     => $monthlyIncome,
-            'monthlyExpense'    => $monthlyExpense,
-            'monthlySavings'    => $monthlyIncome - $monthlyExpense,
-            'recentIncome'      => $recentIncome,
-            'recentExpenses'    => $recentExpenses,
-            'recentTransfers'   => $recentTransfers,
-            'expenseByCategory' => $expenseByCategory,
-            'monthlyTrend'      => $monthlyTrend,
-            'accountCount'      => $user->accounts()->active()->count(),
+            'totalBalance'       => $totalBalance,
+            'monthlyIncome'      => $monthlyIncome,
+            'monthlyExpense'     => $monthlyExpense,
+            'monthlySavings'     => $monthlyIncome - $monthlyExpense,
+            'recentIncome'       => $recentIncome,
+            'recentExpenses'     => $recentExpenses,
+            'recentTransfers'    => $recentTransfers,
+            'expenseByCategory'  => $expenseByCategory,
+            'monthlyTrend'       => $monthlyTrend,
+            'accountCount'       => $user->accounts()->active()->count(),
+            'activeBudgets'      => $activeBudgets,
+            'upcomingRecurring'  => $upcomingRecurring,
         ];
     }
 }

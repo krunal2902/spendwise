@@ -19,6 +19,7 @@
                     <th>Type</th>
                     <th>Source</th>
                     <th>Status</th>
+                    <th>Lock</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -38,6 +39,7 @@
                     { data: 'type_badge', name: 'type' },
                     { data: 'system_badge', name: 'is_system' },
                     { data: 'status_badge', name: 'is_active' },
+                    { data: 'lock_badge', name: 'is_locked', orderable: false, searchable: false, className: 'text-center' },
                     { data: 'action', name: 'action', orderable: false, searchable: false, className: 'text-center' }
                 ],
                 order: [[1, 'asc']],

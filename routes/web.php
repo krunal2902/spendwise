@@ -27,6 +27,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Categories
     Route::resource('categories', CategoryController::class)->except(['show', 'destroy']);
     Route::patch('categories/{category}/toggle', [CategoryController::class, 'toggle'])->name('categories.toggle');
+    Route::patch('categories/{category}/lock', [CategoryController::class, 'toggleLock'])->name('categories.lock');
 
     // Income
     Route::resource('incomes', IncomeController::class)->except(['show']);

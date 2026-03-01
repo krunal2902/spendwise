@@ -39,6 +39,12 @@ class CategoryController extends Controller
                     $text = $row->is_active ? 'Active' : 'Inactive';
                     return '<span class="px-2 py-1 text-xs rounded-full '.$color.'">'.$text.'</span>';
                 })
+                ->addColumn('lock_badge', function ($row) {
+                    if ($row->is_locked) {
+                        return '<span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-700"><i class="fas fa-lock text-xs"></i> Locked</span>';
+                    }
+                    return '<span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-500"><i class="fas fa-lock-open text-xs"></i> Open</span>';
+                })
                 ->addColumn('color_dot', function ($row) {
                     if ($row->color) {
                         return '<span class="inline-block w-4 h-4 rounded-full" style="background-color: '.$row->color.'"></span>';
@@ -47,12 +53,20 @@ class CategoryController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     $html = '<div class="flex items-center gap-2">';
-                    // Toggle
+                    // Toggle active
                     $toggleUrl = route('categories.toggle', $row->id);
                     $html .= '<form method="POST" action="'.$toggleUrl.'">'.csrf_field().method_field('PATCH').'
                         <button type="submit" class="text-sm '.($row->is_active ? 'text-yellow-600 hover:text-yellow-800' : 'text-green-600 hover:text-green-800').'">
                             <i class="fas '.($row->is_active ? 'fa-toggle-on' : 'fa-toggle-off').'"></i>
                         </button></form>';
+                    // Toggle lock
+                    if ($row->type === 'expense') {
+                        $lockUrl = route('categories.lock', $row->id);
+                        $html .= '<form method="POST" action="'.$lockUrl.'">'.csrf_field().method_field('PATCH').'
+                            <button type="submit" class="text-sm '.($row->is_locked ? 'text-red-600 hover:text-red-800' : 'text-gray-400 hover:text-gray-600').'" title="'.($row->is_locked ? 'Unlock' : 'Lock').'">
+                                <i class="fas '.($row->is_locked ? 'fa-lock' : 'fa-lock-open').'"></i>
+                            </button></form>';
+                    }
                     // Edit (only non-system)
                     if (!$row->is_system) {
                         $editUrl = route('categories.edit', $row->id);
@@ -61,7 +75,7 @@ class CategoryController extends Controller
                     $html .= '</div>';
                     return $html;
                 })
-                ->rawColumns(['type_badge', 'system_badge', 'status_badge', 'color_dot', 'action'])
+                ->rawColumns(['type_badge', 'system_badge', 'status_badge', 'lock_badge', 'color_dot', 'action'])
                 ->make(true);
         }
 
@@ -111,6 +125,28 @@ class CategoryController extends Controller
         $this->categoryService->toggle($category);
 
         $status = $category->fresh()->is_active ? 'activated' : 'deactivated';
+        return redirect()->route('categories.index')
+            ->with('success', "Category {$status} successfully.");
+    }
+
+    /**
+     * Toggle lock status for an expense category.
+     */
+    public function toggleLock(Request $request, Category $category): RedirectResponse
+    {
+        // Only expense categories can be locked
+        if ($category->type !== 'expense') {
+            return redirect()->route('categories.index')
+                ->with('error', 'Only expense categories can be locked.');
+        }
+
+        if (!$category->is_system && $category->user_id !== $request->user()->id) {
+            abort(403);
+        }
+
+        $category->update(['is_locked' => !$category->is_locked]);
+
+        $status = $category->fresh()->is_locked ? 'locked' : 'unlocked';
         return redirect()->route('categories.index')
             ->with('success', "Category {$status} successfully.");
     }

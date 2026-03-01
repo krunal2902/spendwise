@@ -94,6 +94,70 @@
         </div>
     @endif
 
+    {{-- Budget Overview & Upcoming Recurring --}}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
+        {{-- Budget Overview --}}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-base font-semibold text-gray-800">
+                    <i class="fas fa-piggy-bank text-amber-500 mr-2"></i>Budget Overview
+                </h3>
+                <a href="{{ route('budgets.index') }}" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">View All →</a>
+            </div>
+            @if($activeBudgets->isEmpty())
+                <p class="text-sm text-gray-400">No budgets for this month.</p>
+            @else
+                <div class="space-y-3">
+                    @foreach($activeBudgets as $budget)
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-sm font-medium text-gray-700">{{ $budget['name'] }}</span>
+                                <span class="text-xs {{ $budget['is_exceeded'] ? 'text-red-600 font-bold' : 'text-gray-500' }}">
+                                    ₹{{ number_format($budget['spent'], 2) }} / ₹{{ number_format($budget['amount'], 2) }}
+                                </span>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-2">
+                                @php
+                                    $barColor = $budget['usage_percent'] > 100 ? '#EF4444' : ($budget['usage_percent'] > 80 ? '#F59E0B' : '#22C55E');
+                                    $barWidth = min($budget['usage_percent'], 100);
+                                @endphp
+                                <div class="h-2 rounded-full transition-all" style="width: {{ $barWidth }}%; background-color: {{ $barColor }}"></div>
+                            </div>
+                            @if($budget['is_exceeded'])
+                                <p class="text-xs text-red-500 mt-0.5"><i class="fas fa-exclamation-triangle text-xs"></i> Exceeded by ₹{{ number_format(abs($budget['remaining']), 2) }}</p>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+
+        {{-- Upcoming Recurring --}}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-base font-semibold text-gray-800">
+                    <i class="fas fa-redo-alt text-purple-500 mr-2"></i>Upcoming Recurring
+                </h3>
+                <a href="{{ route('recurring-expenses.index') }}" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">View All →</a>
+            </div>
+            @if($upcomingRecurring->isEmpty())
+                <p class="text-sm text-gray-400">No upcoming recurring expenses in the next 7 days.</p>
+            @else
+                <div class="space-y-3">
+                    @foreach($upcomingRecurring as $recurring)
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">{{ $recurring->description ?? $recurring->category->name }}</p>
+                                <p class="text-xs text-gray-400">{{ $recurring->next_due_date->format('M d') }} · {{ $recurring->account->name }} · {{ $recurring->frequency_label }}</p>
+                            </div>
+                            <span class="text-sm font-bold text-red-600">₹{{ number_format($recurring->amount, 2) }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+    </div>
+
     {{-- Recent Transactions --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {{-- Recent Income --}}

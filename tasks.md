@@ -139,15 +139,15 @@
 - [x] Test: Tag CRUD, tagging expenses, edit history tracking
 
 ### Phase 12: Category Locking & Part 2 Final Testing
-- [ ] Add `is_locked` column to `categories` table (migration)
-- [ ] Update `Category` model (locked scope, logic)
-- [ ] Create `CategoryLockService` (check & lock logic)
-- [ ] Hook lock check into `ExpenseService` on create
-- [ ] Update category views (locked indicator)
-- [ ] Update expense views (locked category warning)
-- [ ] Update Dashboard with budget overview widgets
-- [ ] Full integration testing of all Part 2 features
-- [ ] Mark Part 2 complete
+- [x] Add `is_locked` column to `categories` table (migration)
+- [x] Update `Category` model (locked scope, logic)
+- [x] Create `CategoryLockService` (check & lock logic)
+- [x] Hook lock check into `ExpenseService` on create
+- [x] Update category views (locked indicator)
+- [x] Update expense views (locked category warning)
+- [x] Update Dashboard with budget overview widgets
+- [x] Full integration testing of all Part 2 features
+- [x] Mark Part 2 complete
 
 ---
 

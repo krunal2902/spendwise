@@ -27,6 +27,12 @@ class ExpenseService
                 throw new \Exception("Insufficient balance in {$account->name}. Available: ₹" . number_format($account->balance, 2));
             }
 
+            // Check if category is locked
+            $category = \App\Models\Category::find($data['category_id']);
+            if ($category && $category->is_locked) {
+                throw new \Exception("Category '{$category->name}' is locked. You cannot add expenses to a locked category.");
+            }
+
             // Extract tags before creating expense
             $tags = $data['tags'] ?? [];
             unset($data['tags']);

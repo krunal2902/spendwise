@@ -19,6 +19,7 @@ class Category extends Model
         'color',
         'is_system',
         'is_active',
+        'is_locked',
     ];
 
     protected function casts(): array
@@ -26,6 +27,7 @@ class Category extends Model
         return [
             'is_system' => 'boolean',
             'is_active' => 'boolean',
+            'is_locked' => 'boolean',
         ];
     }
 
@@ -81,5 +83,15 @@ class Category extends Model
             $q->where('user_id', $userId)
               ->orWhere('is_system', true);
         });
+    }
+
+    public function scopeLocked($query)
+    {
+        return $query->where('is_locked', true);
+    }
+
+    public function scopeUnlocked($query)
+    {
+        return $query->where('is_locked', false);
     }
 }
