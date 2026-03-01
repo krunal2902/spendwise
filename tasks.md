@@ -78,17 +78,76 @@
 
 ---
 
-## PART 2 – Budgeting & Expense Enhancements *(Blocked – waiting for Part 1 completion)*
+## PART 2 – Budgeting & Expense Enhancements *(Current)*
 
-- [ ] Monthly Budget Management (CRUD, month/year scoping)
-- [ ] Category-Wise Budgets (per-category limits)
-- [ ] Time-Bound Budgets (custom date range budgets)
-- [ ] Budget Carry-Forward Logic (scheduled command)
-- [ ] Recurring / Scheduled Expenses (cron-based auto-creation)
-- [ ] Expense Tags (many-to-many tagging system)
-- [ ] Expense Edit History (version tracking)
-- [ ] Category Locking (auto-lock when budget exceeded)
-- [ ] Testing & Integration with Part 1
+### Phase 7: Monthly Budget Management
+- [x] Create `budgets` migration (user_id, name, amount, month, year, notes)
+- [x] Create `Budget` model with relationships & scopes
+- [x] Create `BudgetService` (CRUD, month/year scoping, spent calculation)
+- [x] Create `StoreBudgetRequest` / `UpdateBudgetRequest`
+- [x] Create `BudgetController` (full CRUD)
+- [x] Create Blade views for Budgets (index, create, edit, show)
+- [x] Add routes for budgets
+- [x] Test: Budget CRUD, month scope, ownership isolation
+
+### Phase 8: Category-Wise Budgets
+- [ ] Create `category_budgets` migration (budget_id, category_id, amount)
+- [ ] Create `CategoryBudget` model
+- [ ] Update `BudgetService` with category budget logic
+- [ ] Update `Budget` model with `categoryBudgets()` relationship
+- [ ] Create `StoreCategoryBudgetRequest`
+- [ ] Update `BudgetController` for category budget management
+- [ ] Update budget views (add category breakdown UI)
+- [ ] Test: Per-category limits, spent vs budgeted
+
+### Phase 9: Time-Bound Budgets & Carry-Forward
+- [ ] Add `start_date`, `end_date`, `type` columns to budgets (migration)
+- [ ] Update `Budget` model with date scopes
+- [ ] Update `BudgetService` with date-range filtering & carry-forward logic
+- [ ] Create `BudgetCarryForwardCommand` (Artisan scheduled command)
+- [ ] Register scheduled command in `routes/console.php`
+- [ ] Update budget views (date range picker, carry-forward indicator)
+- [ ] Update form requests for new date fields
+- [ ] Test: Custom date budgets, carry-forward execution
+
+### Phase 10: Recurring / Scheduled Expenses
+- [ ] Create `recurring_expenses` migration
+- [ ] Create `RecurringExpense` model
+- [ ] Create `RecurringExpenseService` (CRUD + auto-creation logic)
+- [ ] Create `ProcessRecurringExpensesCommand` (Artisan cron command)
+- [ ] Register scheduled command
+- [ ] Create `RecurringExpenseController`
+- [ ] Create form requests for recurring expenses
+- [ ] Create Blade views (index, create, edit)
+- [ ] Add routes
+- [ ] Test: Recurring CRUD, auto-creation accuracy, balance impact
+
+### Phase 11: Expense Tags & Edit History
+- [ ] Create `tags` migration (user_id, name)
+- [ ] Create `expense_tag` pivot migration
+- [ ] Create `Tag` model
+- [ ] Update `Expense` model with `tags()` relationship
+- [ ] Create `TagService`
+- [ ] Update `ExpenseService` to handle tags on create/update
+- [ ] Update expense views (tag input, display)
+- [ ] Update expense form requests for tags validation
+- [ ] Create `expense_histories` migration
+- [ ] Create `ExpenseHistory` model
+- [ ] Update `ExpenseService` to log history on update
+- [ ] Add history view to expense edit page
+- [ ] Add routes for tags if needed
+- [ ] Test: Tag CRUD, tagging expenses, edit history tracking
+
+### Phase 12: Category Locking & Part 2 Final Testing
+- [ ] Add `is_locked` column to `categories` table (migration)
+- [ ] Update `Category` model (locked scope, logic)
+- [ ] Create `CategoryLockService` (check & lock logic)
+- [ ] Hook lock check into `ExpenseService` on create
+- [ ] Update category views (locked indicator)
+- [ ] Update expense views (locked category warning)
+- [ ] Update Dashboard with budget overview widgets
+- [ ] Full integration testing of all Part 2 features
+- [ ] Mark Part 2 complete
 
 ---
 

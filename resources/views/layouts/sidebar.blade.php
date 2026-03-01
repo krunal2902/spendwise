@@ -54,6 +54,12 @@
                     <i class="fas fa-exchange-alt w-5 text-center text-blue-400"></i>
                     <span>Transfers</span>
                 </a>
+                <a href="{{ route('budgets.index') }}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition
+                          {{ request()->routeIs('budgets.*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-700 text-gray-300' }}">
+                    <i class="fas fa-piggy-bank w-5 text-center text-amber-400"></i>
+                    <span>Budgets</span>
+                </a>
             </div>
         </div>
 
