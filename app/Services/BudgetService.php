@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Models\Budget;
+use App\Models\CategoryBudget;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class BudgetService
 {
@@ -17,7 +19,7 @@ class BudgetService
      */
     public function getForUser(User $user, ?int $month = null, ?int $year = null): Collection
     {
-        $query = $user->budgets()->orderByDesc('year')->orderByDesc('month');
+        $query = $user->budgets()->with('categoryBudgets.category')->orderByDesc('year')->orderByDesc('month');
 
         if ($month && $year) {
             $query->forMonth($month, $year);
@@ -68,15 +70,11 @@ class BudgetService
     }
 
     /**
-     * Get a summary for a given month/year:
-     *  - total budgeted
-     *  - total spent
-     *  - remaining
-     *  - usage percent
+     * Get a summary for a given month/year.
      */
     public function getMonthlySummary(User $user, int $month, int $year): array
     {
-        $budgets = $user->budgets()->forMonth($month, $year)->get();
+        $budgets = $user->budgets()->with('categoryBudgets.category')->forMonth($month, $year)->get();
 
         $totalBudgeted = $budgets->sum('amount');
         $totalSpent = (float) $user->expenses()
@@ -93,5 +91,39 @@ class BudgetService
                 : 0,
             'budgets'        => $budgets,
         ];
+    }
+
+    /**
+     * Sync category budgets for a given budget.
+     * Accepts an array of ['category_id' => ..., 'amount' => ...] entries.
+     */
+    public function syncCategoryBudgets(Budget $budget, array $categories): void
+    {
+        DB::transaction(function () use ($budget, $categories) {
+            // Delete existing category budgets
+            $budget->categoryBudgets()->delete();
+
+            // Insert new ones
+            foreach ($categories as $entry) {
+                if (!empty($entry['category_id']) && !empty($entry['amount']) && $entry['amount'] > 0) {
+                    $budget->categoryBudgets()->create([
+                        'category_id' => $entry['category_id'],
+                        'amount'      => $entry['amount'],
+                    ]);
+                }
+            }
+        });
+
+        $this->activityLogService->log('updated', $budget, ['action' => 'category_budgets_synced'], [
+            'category_count' => count($categories),
+        ]);
+    }
+
+    /**
+     * Get category budget breakdown for a budget, with spent amounts.
+     */
+    public function getCategoryBreakdown(Budget $budget): Collection
+    {
+        return $budget->categoryBudgets()->with('category')->get();
     }
 }

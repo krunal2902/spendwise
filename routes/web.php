@@ -38,6 +38,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Budgets
     Route::resource('budgets', BudgetController::class);
+    Route::post('budgets/{budget}/category-budgets', [BudgetController::class, 'storeCategoryBudgets'])->name('budgets.category-budgets.store');
 
     // Activity Logs
     Route::get('activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');

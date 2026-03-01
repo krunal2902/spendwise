@@ -60,10 +60,117 @@
         </div>
     </div>
 
-    {{-- Category Breakdown --}}
+    {{-- Category Budget Allocations --}}
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-base font-bold text-gray-800">Category Budget Limits</h3>
+            <button onclick="document.getElementById('categoryBudgetForm').classList.toggle('hidden')"
+                    class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+                <i class="fas fa-sliders-h text-xs"></i> {{ $budget->categoryBudgets->isNotEmpty() ? 'Edit Allocations' : 'Set Allocations' }}
+            </button>
+        </div>
+
+        {{-- Existing Category Budgets Display --}}
+        @if($budget->categoryBudgets->isNotEmpty())
+            <div class="space-y-3 mb-4">
+                @foreach($budget->categoryBudgets as $catBudget)
+                    <div class="border border-gray-100 rounded-lg p-3">
+                        <div class="flex items-center justify-between text-sm mb-1">
+                            <span class="text-gray-700 font-medium">{{ $catBudget->category->name ?? 'Unknown' }}</span>
+                            <div class="text-right">
+                                <span class="{{ $catBudget->is_exceeded ? 'text-red-600' : 'text-gray-600' }}">
+                                    ₹{{ number_format($catBudget->spent, 2) }}
+                                </span>
+                                <span class="text-gray-400">/</span>
+                                <span class="text-gray-700 font-semibold">₹{{ number_format($catBudget->amount, 2) }}</span>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            @php $catPct = $catBudget->usage_percent; @endphp
+                            <div class="h-2 rounded-full transition-all {{ $catPct > 100 ? 'bg-red-500' : ($catPct > 80 ? 'bg-amber-500' : 'bg-green-500') }}"
+                                 style="width: {{ min($catPct, 100) }}%"></div>
+                        </div>
+                        <div class="flex items-center justify-between mt-1">
+                            <span class="text-xs {{ $catBudget->remaining >= 0 ? 'text-green-600' : 'text-red-600' }}">
+                                {{ $catBudget->remaining >= 0 ? '₹'.number_format($catBudget->remaining, 2).' left' : '₹'.number_format(abs($catBudget->remaining), 2).' over' }}
+                            </span>
+                            <span class="text-xs {{ $catPct > 100 ? 'text-red-600' : ($catPct > 80 ? 'text-amber-600' : 'text-green-600') }} font-semibold">
+                                {{ $catPct }}%
+                            </span>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <p class="text-sm text-gray-400 mb-4">No per-category limits set yet. Click "Set Allocations" to assign spending limits per category.</p>
+        @endif
+
+        {{-- Category Budget Form (hidden by default) --}}
+        <div id="categoryBudgetForm" class="{{ $budget->categoryBudgets->isEmpty() ? '' : 'hidden' }}">
+            <form method="POST" action="{{ route('budgets.category-budgets.store', $budget) }}">
+                @csrf
+
+                <div id="categoryRows" class="space-y-3">
+                    @if($budget->categoryBudgets->isNotEmpty())
+                        @foreach($budget->categoryBudgets as $i => $catBudget)
+                            <div class="flex items-center gap-3 category-row">
+                                <select name="categories[{{ $i }}][category_id]" class="flex-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm" required>
+                                    <option value="">Select Category</option>
+                                    @foreach($categories as $cat)
+                                        <option value="{{ $cat->id }}" {{ $catBudget->category_id == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                    @endforeach
+                                </select>
+                                <input type="number" name="categories[{{ $i }}][amount]" step="0.01" min="0.01"
+                                       value="{{ $catBudget->amount }}" placeholder="Amount (₹)"
+                                       class="w-40 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm" required>
+                                <button type="button" onclick="this.closest('.category-row').remove()" class="text-red-500 hover:text-red-700">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        @endforeach
+                    @else
+                        <div class="flex items-center gap-3 category-row">
+                            <select name="categories[0][category_id]" class="flex-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm" required>
+                                <option value="">Select Category</option>
+                                @foreach($categories as $cat)
+                                    <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                @endforeach
+                            </select>
+                            <input type="number" name="categories[0][amount]" step="0.01" min="0.01" placeholder="Amount (₹)"
+                                   class="w-40 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm" required>
+                            <button type="button" onclick="this.closest('.category-row').remove()" class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    @endif
+                </div>
+
+                @if($errors->any())
+                    <div class="mt-2">
+                        @foreach($errors->all() as $error)
+                            <p class="text-sm text-red-600">{{ $error }}</p>
+                        @endforeach
+                    </div>
+                @endif
+
+                <div class="flex items-center gap-3 mt-4">
+                    <button type="button" onclick="addCategoryRow()" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+                        <i class="fas fa-plus text-xs"></i> Add Category
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-4 mt-4 pt-4 border-t border-gray-100">
+                    <x-primary-button>{{ __('Save Category Budgets') }}</x-primary-button>
+                    <button type="button" onclick="document.getElementById('categoryBudgetForm').classList.add('hidden')" class="text-sm text-gray-600 hover:text-gray-900">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- Category Spending Breakdown (actual spending) --}}
     @if($categoryBreakdown->isNotEmpty())
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
-        <h3 class="text-base font-bold text-gray-800 mb-4">Spending by Category</h3>
+        <h3 class="text-base font-bold text-gray-800 mb-4">Actual Spending by Category</h3>
         <div class="space-y-3">
             @foreach($categoryBreakdown as $item)
                 @php
@@ -111,4 +218,35 @@
             </div>
         @endif
     </div>
+
+    @push('scripts')
+    <script>
+        let rowIndex = {{ $budget->categoryBudgets->count() ?: 1 }};
+
+        function addCategoryRow() {
+            const container = document.getElementById('categoryRows');
+            const categoriesJson = @json($categories->map(fn($c) => ['id' => $c->id, 'name' => $c->name]));
+
+            let options = '<option value="">Select Category</option>';
+            categoriesJson.forEach(c => {
+                options += `<option value="${c.id}">${c.name}</option>`;
+            });
+
+            const row = document.createElement('div');
+            row.className = 'flex items-center gap-3 category-row';
+            row.innerHTML = `
+                <select name="categories[${rowIndex}][category_id]" class="flex-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm" required>
+                    ${options}
+                </select>
+                <input type="number" name="categories[${rowIndex}][amount]" step="0.01" min="0.01" placeholder="Amount (₹)"
+                       class="w-40 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm" required>
+                <button type="button" onclick="this.closest('.category-row').remove()" class="text-red-500 hover:text-red-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            container.appendChild(row);
+            rowIndex++;
+        }
+    </script>
+    @endpush
 </x-app-layout>

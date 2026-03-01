@@ -91,14 +91,14 @@
 - [x] Test: Budget CRUD, month scope, ownership isolation
 
 ### Phase 8: Category-Wise Budgets
-- [ ] Create `category_budgets` migration (budget_id, category_id, amount)
-- [ ] Create `CategoryBudget` model
-- [ ] Update `BudgetService` with category budget logic
-- [ ] Update `Budget` model with `categoryBudgets()` relationship
-- [ ] Create `StoreCategoryBudgetRequest`
-- [ ] Update `BudgetController` for category budget management
-- [ ] Update budget views (add category breakdown UI)
-- [ ] Test: Per-category limits, spent vs budgeted
+- [x] Create `category_budgets` migration (budget_id, category_id, amount)
+- [x] Create `CategoryBudget` model
+- [x] Update `BudgetService` with category budget logic
+- [x] Update `Budget` model with `categoryBudgets()` relationship
+- [x] Create `StoreCategoryBudgetRequest`
+- [x] Update `BudgetController` for category budget management
+- [x] Update budget views (add category breakdown UI)
+- [x] Test: Per-category limits, spent vs budgeted
 
 ### Phase 9: Time-Bound Budgets & Carry-Forward
 - [ ] Add `start_date`, `end_date`, `type` columns to budgets (migration)

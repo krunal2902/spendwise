@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Budget\StoreBudgetRequest;
+use App\Http\Requests\Budget\StoreCategoryBudgetRequest;
 use App\Http\Requests\Budget\UpdateBudgetRequest;
 use App\Models\Budget;
 use App\Services\BudgetService;
+use App\Services\CategoryService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -14,6 +16,7 @@ class BudgetController extends Controller
 {
     public function __construct(
         private BudgetService $budgetService,
+        private CategoryService $categoryService,
     ) {}
 
     /**
@@ -67,6 +70,8 @@ class BudgetController extends Controller
             abort(403);
         }
 
+        $budget->load('categoryBudgets.category');
+
         // Get expenses for this budget's month/year
         $expenses = $request->user()->expenses()
             ->with(['category', 'account'])
@@ -75,7 +80,7 @@ class BudgetController extends Controller
             ->orderByDesc('expense_date')
             ->get();
 
-        // Category-wise breakdown
+        // Category-wise breakdown (actual spending)
         $categoryBreakdown = $request->user()->expenses()
             ->whereMonth('expense_date', $budget->month)
             ->whereYear('expense_date', $budget->year)
@@ -84,7 +89,21 @@ class BudgetController extends Controller
             ->with('category')
             ->get();
 
-        return view('budgets.show', compact('budget', 'expenses', 'categoryBreakdown'));
+        // All expense categories for the category budget form
+        $categories = $this->categoryService->getForUser($request->user(), 'expense');
+
+        return view('budgets.show', compact('budget', 'expenses', 'categoryBreakdown', 'categories'));
+    }
+
+    /**
+     * Save category-wise budget allocations.
+     */
+    public function storeCategoryBudgets(StoreCategoryBudgetRequest $request, Budget $budget): RedirectResponse
+    {
+        $this->budgetService->syncCategoryBudgets($budget, $request->validated()['categories']);
+
+        return redirect()->route('budgets.show', $budget)
+            ->with('success', 'Category budgets updated successfully.');
     }
 
     /**
