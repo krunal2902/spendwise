@@ -1,0 +1,66 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="text-xl font-bold text-gray-800">Edit Income</h2>
+    </x-slot>
+
+    <div class="max-w-2xl">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <form method="POST" action="{{ route('incomes.update', $income) }}">
+                @csrf @method('PUT')
+
+                <div class="mb-4">
+                    <x-input-label for="account_id" :value="__('Account')" />
+                    <select id="account_id" name="account_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                        @foreach($accounts as $account)
+                            <option value="{{ $account->id }}" {{ old('account_id', $income->account_id) == $account->id ? 'selected' : '' }}>
+                                {{ $account->name }} (₹{{ number_format($account->balance, 2) }})
+                            </option>
+                        @endforeach
+                    </select>
+                    <x-input-error :messages="$errors->get('account_id')" class="mt-2" />
+                </div>
+
+                <div class="mb-4">
+                    <x-input-label for="category_id" :value="__('Category')" />
+                    <select id="category_id" name="category_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" {{ old('category_id', $income->category_id) == $category->id ? 'selected' : '' }}>
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
+                </div>
+
+                <div class="mb-4">
+                    <x-input-label for="amount" :value="__('Amount (₹)')" />
+                    <x-text-input id="amount" name="amount" type="number" step="0.01" min="0.01" class="mt-1 block w-full" :value="old('amount', $income->amount)" required />
+                    <x-input-error :messages="$errors->get('amount')" class="mt-2" />
+                </div>
+
+                <div class="mb-4">
+                    <x-input-label for="income_date" :value="__('Date')" />
+                    <x-text-input id="income_date" name="income_date" type="date" class="mt-1 block w-full" :value="old('income_date', $income->income_date->format('Y-m-d'))" required />
+                    <x-input-error :messages="$errors->get('income_date')" class="mt-2" />
+                </div>
+
+                <div class="mb-4">
+                    <x-input-label for="description" :value="__('Description (optional)')" />
+                    <x-text-input id="description" name="description" type="text" class="mt-1 block w-full" :value="old('description', $income->description)" />
+                    <x-input-error :messages="$errors->get('description')" class="mt-2" />
+                </div>
+
+                <div class="mb-4">
+                    <x-input-label for="reference" :value="__('Reference (optional)')" />
+                    <x-text-input id="reference" name="reference" type="text" class="mt-1 block w-full" :value="old('reference', $income->reference)" />
+                    <x-input-error :messages="$errors->get('reference')" class="mt-2" />
+                </div>
+
+                <div class="flex items-center gap-4 mt-6">
+                    <x-primary-button>{{ __('Update Income') }}</x-primary-button>
+                    <a href="{{ route('incomes.index') }}" class="text-sm text-gray-600 hover:text-gray-900">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</x-app-layout>
