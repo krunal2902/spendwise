@@ -10,3 +10,6 @@ Artisan::command('inspire', function () {
 
 // Budget carry-forward: runs on the 1st of every month at midnight
 Schedule::command('budgets:carry-forward')->monthlyOn(1, '00:00');
+
+// Process recurring expenses daily at 6 AM
+Schedule::command('expenses:process-recurring')->dailyAt('06:00');

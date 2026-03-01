@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RecurringExpenseController;
 use App\Http\Controllers\TransferController;
 use Illuminate\Support\Facades\Route;
 
@@ -39,6 +40,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Budgets
     Route::resource('budgets', BudgetController::class);
     Route::post('budgets/{budget}/category-budgets', [BudgetController::class, 'storeCategoryBudgets'])->name('budgets.category-budgets.store');
+
+    // Recurring Expenses
+    Route::resource('recurring-expenses', RecurringExpenseController::class)->except(['show']);
+    Route::patch('recurring-expenses/{recurring_expense}/toggle', [RecurringExpenseController::class, 'toggle'])->name('recurring-expenses.toggle');
 
     // Activity Logs
     Route::get('activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');

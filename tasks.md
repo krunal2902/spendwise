@@ -111,16 +111,16 @@
 - [x] Test: Custom date budgets, carry-forward execution
 
 ### Phase 10: Recurring / Scheduled Expenses
-- [ ] Create `recurring_expenses` migration
-- [ ] Create `RecurringExpense` model
-- [ ] Create `RecurringExpenseService` (CRUD + auto-creation logic)
-- [ ] Create `ProcessRecurringExpensesCommand` (Artisan cron command)
-- [ ] Register scheduled command
-- [ ] Create `RecurringExpenseController`
-- [ ] Create form requests for recurring expenses
-- [ ] Create Blade views (index, create, edit)
-- [ ] Add routes
-- [ ] Test: Recurring CRUD, auto-creation accuracy, balance impact
+- [x] Create `recurring_expenses` migration
+- [x] Create `RecurringExpense` model
+- [x] Create `RecurringExpenseService` (CRUD + auto-creation logic)
+- [x] Create `ProcessRecurringExpensesCommand` (Artisan cron command)
+- [x] Register scheduled command
+- [x] Create `RecurringExpenseController`
+- [x] Create form requests for recurring expenses
+- [x] Create Blade views (index, create, edit)
+- [x] Add routes
+- [x] Test: Recurring CRUD, auto-creation accuracy, balance impact
 
 ### Phase 11: Expense Tags & Edit History
 - [ ] Create `tags` migration (user_id, name)
