@@ -25,6 +25,8 @@ class User extends Authenticatable
         'role',
         'phone',
         'currency',
+        'emergency_mode',
+        'focus_mode',
     ];
 
     /**
@@ -47,6 +49,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'emergency_mode' => 'boolean',
+            'focus_mode' => 'boolean',
         ];
     }
 
@@ -99,6 +103,33 @@ class User extends Authenticatable
     public function tags(): HasMany
     {
         return $this->hasMany(Tag::class);
+    }
+
+    /**
+     * Groups owned by this user.
+     */
+    public function ownedGroups(): HasMany
+    {
+        return $this->hasMany(Group::class);
+    }
+
+    /**
+     * Groups this user is a member of (active membership).
+     */
+    public function groups(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Group::class, 'group_members')
+            ->wherePivot('status', 'active')
+            ->withPivot(['role', 'status', 'joined_at'])
+            ->withTimestamps();
+    }
+
+    /**
+     * All group membership records for this user.
+     */
+    public function groupMemberships(): HasMany
+    {
+        return $this->hasMany(GroupMember::class);
     }
 
     /*

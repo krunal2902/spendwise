@@ -11,6 +11,7 @@ class TransferService
 {
     public function __construct(
         private ActivityLogService $activityLogService,
+        private AlertService $alertService,
     ) {}
 
     /**
@@ -45,6 +46,9 @@ class TransferService
             $toAccount->increment('balance', $transfer->amount);
 
             $this->activityLogService->log('created', $transfer, null, $transfer->toArray());
+
+            // Dispatch alerts
+            $this->alertService->checkLowBalance($user->id, clone $fromAccount);
 
             return $transfer;
         });

@@ -20,6 +20,7 @@ class Category extends Model
         'is_system',
         'is_active',
         'is_locked',
+        'is_essential',
     ];
 
     protected function casts(): array
@@ -28,6 +29,7 @@ class Category extends Model
             'is_system' => 'boolean',
             'is_active' => 'boolean',
             'is_locked' => 'boolean',
+            'is_essential' => 'boolean',
         ];
     }
 

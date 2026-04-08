@@ -3,13 +3,17 @@
         <h2 class="text-xl font-bold text-gray-800">Dashboard</h2>
     </x-slot>
 
+    @php
+        $privacyBlur = (Auth::check() && Auth::user()->focus_mode) ? 'filter blur-md hover:blur-none transition-all duration-300 cursor-pointer select-none' : '';
+    @endphp
+
     {{-- Summary Cards --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
         <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-white/70 uppercase tracking-wider">Total Balance</p>
-                    <p class="text-2xl font-bold mt-1">₹{{ number_format($totalBalance, 2) }}</p>
+                    <p class="text-2xl font-bold mt-1 {{ $privacyBlur }}">₹{{ number_format($totalBalance, 2) }}</p>
                     <p class="text-xs text-white/50 mt-1">{{ $accountCount }} account(s)</p>
                 </div>
                 <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
@@ -21,7 +25,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-white/70 uppercase tracking-wider">Monthly Income</p>
-                    <p class="text-2xl font-bold mt-1">+₹{{ number_format($monthlyIncome, 2) }}</p>
+                    <p class="text-2xl font-bold mt-1 {{ $privacyBlur }}">+₹{{ number_format($monthlyIncome, 2) }}</p>
                     <p class="text-xs text-white/50 mt-1">{{ now()->format('F Y') }}</p>
                 </div>
                 <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
@@ -33,7 +37,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-white/70 uppercase tracking-wider">Monthly Expenses</p>
-                    <p class="text-2xl font-bold mt-1">-₹{{ number_format($monthlyExpense, 2) }}</p>
+                    <p class="text-2xl font-bold mt-1 {{ $privacyBlur }}">-₹{{ number_format($monthlyExpense, 2) }}</p>
                     <p class="text-xs text-white/50 mt-1">{{ now()->format('F Y') }}</p>
                 </div>
                 <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
@@ -45,7 +49,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-white/70 uppercase tracking-wider">Net Savings</p>
-                    <p class="text-2xl font-bold mt-1">₹{{ number_format($monthlySavings, 2) }}</p>
+                    <p class="text-2xl font-bold mt-1 {{ $privacyBlur }}">₹{{ number_format($monthlySavings, 2) }}</p>
                     <p class="text-xs text-white/50 mt-1">Income − Expenses</p>
                 </div>
                 <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
@@ -156,6 +160,50 @@
                 </div>
             @endif
         </div>
+    </div>
+
+    {{-- My Groups & Split Bills --}}
+    <div class="mb-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-base font-semibold text-gray-800">
+                <i class="fas fa-users text-teal-500 mr-2"></i>My Groups
+            </h3>
+            <div class="flex items-center gap-3">
+                <span class="text-sm font-medium {{ $groupNetBalance > 0 ? 'text-green-600' : ($groupNetBalance < 0 ? 'text-red-600' : 'text-gray-500') }}">
+                    Overall Balance: {{ $groupNetBalance > 0 ? '+' : '' }}₹{{ number_format(abs($groupNetBalance), 2) }}
+                    @if($groupNetBalance > 0) (Owed to you) @elseif($groupNetBalance < 0) (You owe) @endif
+                </span>
+                <a href="{{ route('groups.index') }}" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">View All →</a>
+            </div>
+        </div>
+        
+        @if($myGroups->isEmpty())
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 text-center">
+                <i class="fas fa-user-friends text-gray-300 text-3xl mb-2"></i>
+                <p class="text-sm text-gray-500">You are not part of any groups yet.</p>
+                <a href="{{ route('groups.create') }}" class="inline-block mt-3 text-sm text-indigo-600 font-medium hover:text-indigo-800">Create a Group</a>
+            </div>
+        @else
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                @foreach($myGroups as $group)
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                                {{ strtoupper(substr($group->name, 0, 2)) }}
+                            </div>
+                            <div>
+                                <a href="{{ route('groups.show', $group) }}" class="font-semibold text-gray-900 hover:text-indigo-600">{{ $group->name }}</a>
+                                <p class="text-xs text-gray-500">{{ $group->memberships_count }} members</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs mt-4 pt-3 border-t">
+                            <a href="{{ route('groups.expenses.index', $group) }}" class="text-gray-600 hover:text-indigo-600"><i class="fas fa-receipt mr-1"></i> Expenses</a>
+                            <a href="{{ route('groups.balances.index', $group) }}" class="text-gray-600 hover:text-teal-600"><i class="fas fa-balance-scale mr-1"></i> Balances</a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
     </div>
 
     {{-- Recent Transactions --}}

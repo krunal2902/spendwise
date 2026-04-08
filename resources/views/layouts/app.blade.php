@@ -49,6 +49,19 @@
                     <div class="flex items-center gap-4">
                         <span class="text-sm text-gray-500 hidden sm:inline">{{ now()->format('M d, Y') }}</span>
 
+                        {{-- Notifications Bell --}}
+                        @php
+                            $unreadCount = \App\Models\Notification::where('user_id', Auth::id())->unread()->count();
+                        @endphp
+                        <a href="{{ route('notifications.index') }}" class="relative p-2 text-gray-400 hover:text-gray-500 transition">
+                            <i class="fas fa-bell text-xl"></i>
+                            @if($unreadCount > 0)
+                                <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full">
+                                    {{ $unreadCount > 99 ? '99+' : $unreadCount }}
+                                </span>
+                            @endif
+                        </a>
+
                         {{-- User dropdown --}}
                         <x-dropdown align="right" width="48">
                             <x-slot name="trigger">
@@ -80,6 +93,17 @@
                     </div>
                 </div>
             </header>
+
+            {{-- Emergency Mode Banner --}}
+            @if(Auth::check() && Auth::user()->emergency_mode)
+                <div class="bg-red-600 text-white px-4 py-3 text-center sm:px-6 z-50 sticky top-16 shadow-lg border-b border-red-700">
+                    <p class="text-sm font-bold flex items-center justify-center gap-2">
+                        <i class="fas fa-exclamation-triangle mt-0.5"></i>
+                        🚨 EMERGENCY MODE ACTIVE: Non-essential spending flows are currently locked. 
+                        <a href="{{ route('settings.index') }}" class="underline ml-2 hover:text-red-100">Disable in Settings</a>
+                    </p>
+                </div>
+            @endif
 
             {{-- Flash Messages --}}
             @if(session('success'))

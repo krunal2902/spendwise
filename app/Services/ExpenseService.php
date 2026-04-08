@@ -12,6 +12,7 @@ class ExpenseService
     public function __construct(
         private ActivityLogService $activityLogService,
         private TagService $tagService,
+        private AlertService $alertService,
     ) {}
 
     /**
@@ -33,6 +34,11 @@ class ExpenseService
                 throw new \Exception("Category '{$category->name}' is locked. You cannot add expenses to a locked category.");
             }
 
+            // Check Emergency Mode
+            if ($user->emergency_mode && $category && !$category->is_essential) {
+                throw new \Exception("Emergency Mode is ACTIVE. You cannot log non-essential expenses like '{$category->name}'.");
+            }
+
             // Extract tags before creating expense
             $tags = $data['tags'] ?? [];
             unset($data['tags']);
@@ -49,6 +55,11 @@ class ExpenseService
 
             $this->activityLogService->log('created', $expense, null, $expense->toArray());
 
+            // Dispatch alerts
+            $this->alertService->checkLowBalance($user->id, clone $account);
+            $this->alertService->checkLargeExpense($user->id, clone $expense);
+            $this->alertService->checkBudgetThresholds($user->id);
+
             return $expense;
         });
     }
@@ -59,6 +70,16 @@ class ExpenseService
     public function update(Expense $expense, array $data): Expense
     {
         return DB::transaction(function () use ($expense, $data) {
+            $user = $expense->user;
+            
+            // Check Emergency Mode on Update
+            if ($user->emergency_mode && isset($data['category_id'])) {
+                $category = \App\Models\Category::find($data['category_id']);
+                if ($category && !$category->is_essential) {
+                    throw new \Exception("Emergency Mode is ACTIVE. You cannot change this expense to a non-essential category.");
+                }
+            }
+
             $oldValues = $expense->toArray();
             $oldAmount = $expense->amount;
             $oldAccountId = $expense->account_id;
@@ -102,6 +123,10 @@ class ExpenseService
             $this->tagService->syncForExpense($expense->user, $expense, $tags);
 
             $this->activityLogService->log('updated', $expense, $oldValues, $expense->toArray());
+
+            // Dispatch alerts (re-check balance and budget)
+            $this->alertService->checkLowBalance($expense->user_id, clone $expense->account);
+            $this->alertService->checkBudgetThresholds($expense->user_id);
 
             return $expense;
         });

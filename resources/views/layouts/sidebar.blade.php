@@ -68,6 +68,44 @@
                 </a>
         </div>
 
+        {{-- Groups --}}
+        <div>
+            <p class="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Groups</p>
+            <div class="space-y-1">
+                <a href="{{ route('groups.index') }}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition
+                          {{ request()->routeIs('groups.*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-700 text-gray-300' }}">
+                    <i class="fas fa-users w-5 text-center text-teal-400"></i>
+                    <span>Groups</span>
+                </a>
+                <a href="{{ route('invitations.mine') }}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition
+                          {{ request()->routeIs('invitations.*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-700 text-gray-300' }}">
+                    <i class="fas fa-envelope-open w-5 text-center text-teal-400"></i>
+                    <span>Invitations</span>
+                </a>
+            </div>
+        </div>
+
+        {{-- Analytics --}}
+        <div>
+            <p class="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Analytics</p>
+            <div class="space-y-1">
+                <a href="{{ route('reports.index') }}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition
+                          {{ request()->routeIs('reports.*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-700 text-gray-300' }}">
+                    <i class="fas fa-chart-pie w-5 text-center text-pink-400"></i>
+                    <span>Reports</span>
+                </a>
+                <a href="{{ route('health-score.show') }}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition
+                          {{ request()->routeIs('health-score.*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-700 text-gray-300' }}">
+                    <i class="fas fa-heartbeat w-5 text-center text-red-500"></i>
+                    <span>Health Score</span>
+                </a>
+            </div>
+        </div>
+
         {{-- Settings --}}
         <div>
             <p class="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Settings</p>
@@ -78,11 +116,23 @@
                     <i class="fas fa-tags w-5 text-center"></i>
                     <span>Categories</span>
                 </a>
+                <a href="{{ route('alert-rules.index') }}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition
+                          {{ request()->routeIs('alert-rules.*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-700 text-gray-300' }}">
+                    <i class="fas fa-bell w-5 text-center"></i>
+                    <span>Alert Rules</span>
+                </a>
                 <a href="{{ route('activity-logs.index') }}"
                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition
                           {{ request()->routeIs('activity-logs.*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-700 text-gray-300' }}">
                     <i class="fas fa-history w-5 text-center"></i>
                     <span>Activity Log</span>
+                </a>
+                <a href="{{ route('settings.index') }}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition
+                          {{ request()->routeIs('settings.*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-700 text-gray-300' }}">
+                    <i class="fas fa-sliders-h w-5 text-center"></i>
+                    <span>System Settings</span>
                 </a>
             </div>
         </div>

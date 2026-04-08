@@ -5,9 +5,14 @@
 
     <div class="flex items-center justify-between mb-5">
         <p class="text-sm text-gray-500">Track all your spending</p>
-        <a href="{{ route('expenses.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition shadow-sm">
-            <i class="fas fa-plus text-xs"></i> Add Expense
-        </a>
+        <div class="flex gap-2">
+            <a href="{{ route('exports.expenses.csv') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition shadow-sm border border-gray-300">
+                <i class="fas fa-file-csv text-xs text-green-600"></i> Export CSV
+            </a>
+            <a href="{{ route('expenses.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition shadow-sm">
+                <i class="fas fa-plus text-xs"></i> Add Expense
+            </a>
+        </div>
     </div>
 
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">

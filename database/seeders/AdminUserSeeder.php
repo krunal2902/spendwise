@@ -23,5 +23,16 @@ class AdminUserSeeder extends Seeder
                 'currency' => 'INR',
             ]
         );
+
+        User::firstOrCreate(
+            ['email' => 'buddy@spendwise.com'],
+            [
+                'name'     => 'Test Buddy',
+                'password' => Hash::make('password'),
+                'role'     => 'user',
+                'phone'    => null,
+                'currency' => 'INR',
+            ]
+        );
     }
 }

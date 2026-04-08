@@ -95,6 +95,16 @@ class DashboardService
             ->limit(5)
             ->get();
 
+        // Group Summaries
+        $myGroups = $user->groups()->withCount('memberships')->latest()->take(3)->get();
+        
+        $groupNetBalance = 0;
+        $balanceService = app(GroupBalanceService::class);
+        foreach ($user->groups as $group) {
+            $netBalances = $balanceService->getNetBalances($group);
+            $groupNetBalance += $netBalances[$user->id] ?? 0;
+        }
+
         return [
             'totalBalance'       => $totalBalance,
             'monthlyIncome'      => $monthlyIncome,
@@ -108,6 +118,8 @@ class DashboardService
             'accountCount'       => $user->accounts()->active()->count(),
             'activeBudgets'      => $activeBudgets,
             'upcomingRecurring'  => $upcomingRecurring,
+            'myGroups'           => $myGroups,
+            'groupNetBalance'    => round($groupNetBalance, 2),
         ];
     }
 }
