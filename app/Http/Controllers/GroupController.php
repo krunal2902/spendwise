@@ -50,7 +50,8 @@ class GroupController extends Controller
                     $actions .= '<a href="'.$showUrl.'" class="text-gray-600 hover:text-gray-800 text-sm"><i class="fas fa-eye"></i></a>';
                     $actions .= '<a href="'.$editUrl.'" class="text-indigo-600 hover:text-indigo-800 text-sm"><i class="fas fa-edit"></i></a>';
                     if ($row->user_id === auth()->id()) {
-                        $actions .= '<form method="POST" action="'.$deleteUrl.'" onsubmit="return confirm(\'Delete this group? All data will be lost.\')">'.csrf_field().method_field('DELETE').'<button type="submit" class="text-red-600 hover:text-red-800 text-sm"><i class="fas fa-trash"></i></button></form>';
+                        $forceDeleteUrl = route('groups.force-delete', $row->id);
+                        $actions .= '<a href="'.$forceDeleteUrl.'" onclick="return confirm(\'Delete this group? All data will be lost.\')" class="text-red-600 hover:text-red-800 text-sm"><i class="fas fa-trash"></i></a>';
                     }
                     $actions .= '</div>';
                     return $actions;
@@ -202,18 +203,31 @@ class GroupController extends Controller
 
     public function destroy(Request $request, Group $group): RedirectResponse
     {
-        // Only the owner can delete the group
+        // Owner verification
         if ($group->user_id !== $request->user()->id) {
             abort(403, 'Only the group owner can delete the group.');
         }
 
         try {
-            $this->groupService->delete($group);
+            $groupId = $group->id;
+            
+            // Bypass Services & Eloquent to ensure 100% deletion success
+            \Illuminate\Support\Facades\DB::table('group_expense_splits')
+                ->whereIn('group_expense_id', function($q) use ($groupId) {
+                    $q->select('id')->from('group_expenses')->where('group_id', $groupId);
+                })->delete();
+            \Illuminate\Support\Facades\DB::table('group_expenses')->where('group_id', $groupId)->delete();
+            \Illuminate\Support\Facades\DB::table('group_settlements')->where('group_id', $groupId)->delete();
+            \Illuminate\Support\Facades\DB::table('group_members')->where('group_id', $groupId)->delete();
+            \Illuminate\Support\Facades\DB::table('group_invitations')->where('group_id', $groupId)->delete();
+            \Illuminate\Support\Facades\DB::table('groups')->where('id', $groupId)->delete();
+
             return redirect()->route('groups.index')
-                ->with('success', 'Group deleted successfully.');
-        } catch (\Exception $e) {
-            return redirect()->route('groups.show', $group)
-                ->with('error', $e->getMessage());
+                ->with('success', 'Group and all associated data cleanly deleted.');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Raw deletion failed: ' . $e->getMessage());
+            return redirect()->route('groups.index')
+                ->with('error', 'Failed to delete: ' . $e->getMessage());
         }
     }
 

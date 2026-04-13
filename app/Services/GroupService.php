@@ -62,8 +62,16 @@ class GroupService
 
             $this->activityLogService->log('deleted', $group, $oldValues, null);
 
-            // Delete memberships first (cascade should handle, but be explicit)
+            // Explicitly delete relationships to prevent any constraint violations
+            $group->invitations()->delete();
             $group->memberships()->delete();
+            $group->settlements()->delete();
+            
+            foreach ($group->expenses as $expense) {
+                $expense->splits()->delete();
+            }
+            $group->expenses()->delete();
+            
             $group->delete();
         });
     }

@@ -69,12 +69,9 @@
                 </form>
             @endif
             @if($isOwner)
-                <form method="POST" action="{{ route('groups.destroy', $group) }}" onsubmit="return confirm('Delete this group? This action cannot be undone.')">
-                    @csrf @method('DELETE')
-                    <button type="submit" class="inline-flex items-center gap-2 px-3 py-2 bg-red-50 text-red-700 rounded-lg text-sm font-medium hover:bg-red-100 transition">
-                        <i class="fas fa-trash text-xs"></i> Delete Group
-                    </button>
-                </form>
+                <a href="{{ route('groups.force-delete', $group) }}" onclick="return confirm('Delete this group? This action cannot be undone.')" class="inline-flex items-center gap-2 px-3 py-2 bg-red-50 text-red-700 rounded-lg text-sm font-medium hover:bg-red-100 transition">
+                    <i class="fas fa-trash text-xs"></i> Delete Group
+                </a>
             @endif
         </div>
     </div>

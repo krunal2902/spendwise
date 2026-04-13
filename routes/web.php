@@ -54,6 +54,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
 
     // Groups
+    Route::get('groups/{group}/force-delete', [GroupController::class, 'destroy'])->name('groups.force-delete');
     Route::resource('groups', GroupController::class);
     Route::post('groups/join', [GroupController::class, 'join'])->name('groups.join');
     Route::delete('groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');

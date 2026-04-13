@@ -89,6 +89,14 @@ class Group extends Model
         return $this->hasMany(GroupSettlement::class);
     }
 
+    /**
+     * Group expenses.
+     */
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(GroupExpense::class);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Scopes
