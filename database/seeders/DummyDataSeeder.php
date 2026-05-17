@@ -148,7 +148,7 @@ class DummyDataSeeder extends Seeder
         ]);
 
         // 9. Create a Group and Memberships
-        $buddy = User::where('email', 'buddy@spendwise.com')->first();
+        $buddy = User::where('email', 'buddy@expenseflow.com')->first();
         if ($buddy) {
             $group = \App\Models\Group::create([
                 'name' => 'Goa Trip',

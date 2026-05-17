@@ -43,11 +43,11 @@
                                             </h4>
                                             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                                 @if($rule->type === 'budget_threshold')
-                                                    Alert me when a budget reaches <strong>{{ $rule->conditions['threshold_percent'] }}%</strong> of its limit.
+                                                    Alert me when a budget reaches <strong>{{ $rule->conditions['threshold_percent'] ?? 0 }}%</strong> of its limit.
                                                 @elseif($rule->type === 'low_balance')
-                                                    Alert me when an account drops below <strong>{{ number_format($rule->conditions['amount'], 2) }}</strong>.
+                                                    Alert me when an account drops below <strong>{{ number_format($rule->conditions['amount'] ?? 0, 2) }}</strong>.
                                                 @elseif($rule->type === 'large_expense')
-                                                    Alert me when a single expense exceeds <strong>{{ number_format($rule->conditions['amount'], 2) }}</strong>.
+                                                    Alert me when a single expense exceeds <strong>{{ number_format($rule->conditions['amount'] ?? 0, 2) }}</strong>.
                                                 @endif
                                             </p>
                                             @if($rule->last_triggered_at)

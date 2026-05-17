@@ -1,6 +1,6 @@
-# SpendWise
+# Expenseflow
 
-SpendWise is an advanced, comprehensive Personal Finance & Expense Management System built natively on Laravel 12. It provides users with deep tools to manage varied accounts, handle complex multi-user bill splitting, enforce strict budget restrictions, and rapidly generate detailed PDF statements.
+Expenseflow is an advanced, comprehensive Personal Finance & Expense Management System built natively on Laravel 12. It provides users with deep tools to manage varied accounts, handle complex multi-user bill splitting, enforce strict budget restrictions, and rapidly generate detailed PDF statements.
 
 ## 🚀 Key Features
 
@@ -24,8 +24,8 @@ SpendWise is an advanced, comprehensive Personal Finance & Expense Management Sy
 
 1.  Clone this repository.
     ```bash
-    git clone https://github.com/your-username/spendwise.git
-    cd spendwise
+    git clone https://github.com/your-username/expenseflow.git
+    cd expenseflow
     ```
 2.  Install Composer Dependencies.
     ```bash

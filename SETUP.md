@@ -1,6 +1,6 @@
-# 🚀 SpendWise Quick Setup Guide
+# 🚀 Expenseflow Quick Setup Guide
 
-This guide contains the exact sequence of commands to spin up SpendWise locally from scratch in under two minutes.
+This guide contains the exact sequence of commands to spin up Expenseflow locally from scratch in under two minutes.
 
 ## Prerequisites
 Ensure the following are installed and active on your system:
@@ -19,8 +19,8 @@ Create an empty local MySQL database mapped to your app. For example, name it: `
 ### Step 1: Clone & Navigate
 Pull the code directly into your local machine and enter the directory.
 ```bash
-git clone https://github.com/your-username/spendwise.git
-cd spendwise
+git clone https://github.com/your-username/expenseflow.git
+cd expenseflow
 ```
 
 ### Step 2: Core Dependencies
@@ -64,8 +64,8 @@ php artisan serve
 The application is now live at `http://127.0.0.1:8000`. You can test multi-user group synchronization immediately using the pre-built seeded accounts:
 
 - **Admin Account**: 
-  - Email: `admin@spendwise.com`
+  - Email: `admin@expenseflow.com`
   - Password: `password`
 - **Secondary Buddy Account**: 
-  - Email: `buddy@spendwise.com`
+  - Email: `buddy@expenseflow.com`
   - Password: `password`

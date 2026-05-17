@@ -1,6 +1,6 @@
-# SpendWise: End-to-End Testing Guide
+# Expenseflow: End-to-End Testing Guide
 
-This guide breaks down exactly how to test every single operational dimension of SpendWise, segmented cleanly by the original 4-Part master rollout.
+This guide breaks down exactly how to test every single operational dimension of Expenseflow, segmented cleanly by the original 4-Part master rollout.
 
 ---
 

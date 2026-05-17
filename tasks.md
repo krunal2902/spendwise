@@ -1,4 +1,4 @@
-# SpendWise – Budget & Expense Management System
+# Expenseflow – Budget & Expense Management System
 ## Master Task Tracker
 
 ---

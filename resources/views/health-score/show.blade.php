@@ -45,7 +45,7 @@
                     <!-- Top Level Text Message -->
                     <div class="text-left max-w-lg">
                         <h3 class="text-3xl font-bold {{ $textColor }} mb-2">{{ $message }}</h3>
-                        <p class="text-gray-600 dark:text-gray-400 text-lg">Your SpendWise health engine has analyzed your habits, budgeting capabilities, account statuses, and variance trends to generate this score.</p>
+                        <p class="text-gray-600 dark:text-gray-400 text-lg">Your Expenseflow health engine has analyzed your habits, budgeting capabilities, account statuses, and variance trends to generate this score.</p>
                         
                         @if ($score == 100)
                             <div class="mt-4 inline-block bg-teal-100 text-teal-800 px-4 py-2 rounded-lg text-sm font-semibold border border-teal-200 dark:bg-teal-900 dark:text-teal-200 dark:border-teal-700">

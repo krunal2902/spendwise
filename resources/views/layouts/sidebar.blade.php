@@ -8,7 +8,7 @@
             <div class="w-9 h-9 rounded-lg bg-indigo-500 flex items-center justify-center">
                 <i class="fas fa-wallet text-white text-sm"></i>
             </div>
-            <span class="text-lg font-bold text-white tracking-tight">SpendWise</span>
+            <span class="text-lg font-bold text-white tracking-tight">Expenseflow</span>
         </a>
     </div>
 
